@@ -18,6 +18,7 @@
                 </div>
 
             </div>
+            <h3>管理者ページ</h3>
             <div class="link">
                 <a href="#">問題・答え登録 ></a><br>
                 <a href="#">テストをする ></a><br>
