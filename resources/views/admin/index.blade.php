@@ -20,9 +20,9 @@
             </div>
             <h3>管理者ページ</h3>
             <div class="link">
-                <a href="#">問題・答え登録 ></a><br>
+                <a href="/admin/list">問題と答えを確認・登録する ></a><br>
                 <a href="#">テストをする ></a><br>
-                <a href="#">採点履歴 ></a>
+                <a href="#">過去の採点結果をみる ></a>
             </div>
 
         </div>

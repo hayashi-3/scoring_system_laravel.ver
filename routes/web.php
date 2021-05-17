@@ -28,6 +28,7 @@ Route::post('logout', 'Auth\LoginController@logout')->name('logout');
 // adminのみアクセス可能
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'can:admin']], function(){
     Route::resource('user', 'AdminController')->except(['show']);
+    Route::get('list', 'AdminController@list')->name('list');
 });
 
 // 一般userのみアクセス可能
