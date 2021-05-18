@@ -6,5 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Histories extends Model
 {
-    //
+    protected $fillable = [
+        'point',
+    ];
 }

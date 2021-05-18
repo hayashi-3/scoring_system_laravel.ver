@@ -23,7 +23,7 @@ class AdminController extends Controller
      */
     public function list()
     {
-        return view('admin.list');
+        return view('admin.question.list');
     }
 
     /**
@@ -33,7 +33,7 @@ class AdminController extends Controller
      */
     public function create()
     {
-        //
+        return view('admin.user.register');
     }
 
     /**
