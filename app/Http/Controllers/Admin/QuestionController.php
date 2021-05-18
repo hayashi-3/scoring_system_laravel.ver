@@ -36,7 +36,9 @@ class QuestionController extends Controller
      */
     public function list()
     {
-        return view('admin.question.list');
+        $questions = Questions::all();
+        $answers = CorrectAnswers::all();
+        return view('admin.question.list', compact('questions', 'answers'));
     }
 
     /**
@@ -108,7 +110,6 @@ class QuestionController extends Controller
                 ]);
             }
             
-
             \DB::commit();
 
         } catch(\Throwable $e) {
@@ -116,7 +117,7 @@ class QuestionController extends Controller
             abort(500);
         }
 
-        \Session::flash('err_msg', '登録しました。');
+        // \Session::flash('err_msg', '登録しました。');
         return redirect(route('list'));
 
     }
