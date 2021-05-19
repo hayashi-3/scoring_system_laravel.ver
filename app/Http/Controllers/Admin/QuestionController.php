@@ -51,6 +51,7 @@ class QuestionController extends Controller
         return view('admin.question.register');
     }
 
+    // セッションに書き込む、バリデーションをする
     function post(Request $request){
         $input = $request->only($this->formItems);
 
@@ -68,7 +69,7 @@ class QuestionController extends Controller
     }
 
     /**
-     * Show the form for confirm creating a new resource.
+     * confirm creating
      *
      * @return \Illuminate\Http\Response
      */
@@ -130,19 +131,114 @@ class QuestionController extends Controller
      */
     public function edit($id)
     {
-        //
+        $question = Questions::find($id);
+        $answers = Questions::find($id)->correctAnswers;
+
+        if (is_null($question) || is_null($answers)) {
+            // \Session::flash('err_msg', 'データがありません。');
+            return redirect(route('list'));
+        }
+
+        return view('admin.question.edit', ['question' => $question], ['answers' => $answers]);
+    }
+
+    // セッションに書き込む、バリデーションをする
+    function editPost(Request $request){
+        $input = $request->all();
+
+        $validator = Validator::make($input, $this->validator);
+		if($validator->fails()){
+			return redirect()->action("Admin\QuestionController@edit")
+				->withInput()
+				->withErrors($validator);
+		}
+
+        //セッションに書き込む
+		$request->session()->put("form_input", $input);
+
+		return redirect()->action("Admin\QuestionController@editConfirm");
+    }
+
+    /**
+     * Confirm editing
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function editConfirm(Request $request)
+    {
+        //セッションから値を取り出す
+        $input = $request->session()->get("form_input");
+
+        //セッションに値が無い時はフォームに戻る
+        if(!$input){
+            return redirect()->action("QuestionController@edit");
+        }
+        return view("admin.question.editConfirm",["input" => $input]);
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request)
+    {
+        // データを受け取る
+        $input = $request->all();
+        $id = $input['id'];
+        $question = $input['question'];
+
+        $question = Questions::find($id);
+
+        \DB::beginTransaction();
+          try {
+        
+            $question->update([
+            'question' => $input['question'],
+            ]);
+
+            // foreach($answers as $answer){
+            //   foreach($input['answers'] as $inp_a){
+            //     $answer->update([
+            //       'answer' => $inp_a,
+            //     ]);
+            //   }
+            // }
+
+            foreach($input['answers'] as $answer){
+                $question->correctAnswers()->update([
+                    'answer' => $answer,
+                ]);
+            }
+        \DB::commit();
+
+        } catch(\Throwable $e) {
+            \DB::rollback();
+            abort(500);
+        }
+
+        return redirect(route('list'));
+    }
+
+    /**
+     * Confirm remove the specified resource from storage.
+     *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function destroyConfirm($id)
     {
-        //
+        $question = Questions::find($id);
+        $answers = Questions::find($id)->correctAnswers;
+
+        if (is_null($question) || is_null($answers)) {
+            // \Session::flash('err_msg', 'データがありません。');
+            return redirect(route('list'));
+        }
+
+        return view('admin.question.destroyConfirm', ['question' => $question], ['answers' => $answers]);
     }
 
     /**
@@ -153,6 +249,6 @@ class QuestionController extends Controller
      */
     public function destroy($id)
     {
-        //
+
     }
 }
