@@ -188,30 +188,24 @@ class QuestionController extends Controller
         // データを受け取る
         $input = $request->all();
         $id = $input['id'];
-        $question = $input['question'];
 
         $question = Questions::find($id);
-
+        $db_answers = Questions::find($id)->correctAnswers;
+        
         \DB::beginTransaction();
+
           try {
         
             $question->update([
             'question' => $input['question'],
             ]);
 
-            // foreach($answers as $answer){
-            //   foreach($input['answers'] as $inp_a){
-            //     $answer->update([
-            //       'answer' => $inp_a,
-            //     ]);
-            //   }
-            // }
-
             foreach($input['answers'] as $answer){
-                $question->correctAnswers()->update([
+                $model->correctAnswers()->create([
                     'answer' => $answer,
                 ]);
             }
+            
         \DB::commit();
 
         } catch(\Throwable $e) {
@@ -247,8 +241,17 @@ class QuestionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
+        $input = $request->all();
 
+        // onDelete('cascade')の設定をしているため、Questionsのみdestroyする
+        try{
+        $question = Questions::destroy($input['id']);
+        } catch(\Throwable $e) {
+            abort(500);
+        }
+        // \Session::flash('err_msg', '削除しました。');
+        return redirect(route('list'));
     }
 }

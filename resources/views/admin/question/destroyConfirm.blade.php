@@ -6,7 +6,7 @@
       <div class="col-md-8 col-md-offset-2">
           <h2>削除確認</h2>
 
-          <form method="DELETE" action="{{ url('/admin/question/{$question->id}/destroyConfirm') }}">
+          <form method="POST" action="{{ route('question.destroy') }}">
           @csrf
 
               <div class="form-group">

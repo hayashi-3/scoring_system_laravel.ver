@@ -32,7 +32,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'can:admin']], funct
     // ユーザー一覧機能
     Route::get('userList', 'AdminController@userList')->name('userList');
     // 問題のshow以外
-    Route::resource('question', 'Admin\QuestionController')->except(['show', 'create', 'update']);
+    Route::resource('question', 'Admin\QuestionController')->except(['show', 'create', 'update', 'destroy']);
     // 問題一覧機能
     Route::get('list', 'Admin\QuestionController@list')->name('list');
     // 問題の新規投稿 URLをregisterにするためにresouceからcreateを除外
@@ -49,6 +49,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'can:admin']], funct
     Route::post('question/update', 'Admin\QuestionController@update')->name('question.update');
     // 問題の削除確認
     Route::get('question/{id}/destroyConfirm', 'Admin\QuestionController@destroyConfirm')->name('question.destroyConfirm');
+    // 問題の削除
+    Route::post('question/destroy', 'Admin\QuestionController@destroy')->name('question.destroy');
 });
 
 // 一般userのみアクセス可能
