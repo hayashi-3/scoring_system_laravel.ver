@@ -22,7 +22,7 @@
             <div class="link">
                 <a href="list">問題と答えを確認・登録する ></a><br>
                 <a href="#">テストをする ></a><br>
-                <a href="#">過去の採点結果をみる ></a><br>
+                <a href="{{ action('Admin\HistoryController@historiesList') }}">過去の採点結果をみる ></a><br>
                 <a href="/admin/user/list">ユーザーを登録する ></a>
             </div>
 

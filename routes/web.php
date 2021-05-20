@@ -51,6 +51,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'can:admin']], funct
     Route::get('question/{id}/destroyConfirm', 'Admin\QuestionController@destroyConfirm')->name('question.destroyConfirm');
     // 問題の削除
     Route::post('question/destroy', 'Admin\QuestionController@destroy')->name('question.destroy');
+
+    // テスト採点履歴機能
+    Route::get('question/HistoriesList', 'Admin\HistoryController@historiesList')->name('question.historiesList');
 });
 
 // 一般userのみアクセス可能

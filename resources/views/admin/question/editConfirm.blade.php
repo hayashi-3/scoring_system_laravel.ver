@@ -45,7 +45,7 @@
                   キャンセル
                 </a>
                 <button type="submit" class="btn btn-primary">
-                  登録
+                  更新
                 </button>
             </div>
         </form>

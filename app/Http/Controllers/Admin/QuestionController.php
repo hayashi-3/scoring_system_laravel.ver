@@ -190,20 +190,24 @@ class QuestionController extends Controller
         $id = $input['id'];
 
         $question = Questions::find($id);
-        $db_answers = Questions::find($id)->correctAnswers;
+        $answer = Questions::find($id)->correctAnswers;
+
+        // $db_answers = Questions::find($id)->correctAnswers;
         
         \DB::beginTransaction();
 
           try {
         
             $question->update([
-            'question' => $input['question'],
+              'question' => $input['question'],
             ]);
 
-            foreach($input['answers'] as $answer){
-                $model->correctAnswers()->create([
-                    'answer' => $answer,
-                ]);
+            foreach($answer as $ans) {
+                foreach($input['answers'] as $answer){
+                    $question->correctAnswers()->update([
+                        'answer' => $answer,
+                    ]);
+                }
             }
             
         \DB::commit();

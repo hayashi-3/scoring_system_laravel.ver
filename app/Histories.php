@@ -9,4 +9,9 @@ class Histories extends Model
     protected $fillable = [
         'point',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo('App\User');
+    }
 }
