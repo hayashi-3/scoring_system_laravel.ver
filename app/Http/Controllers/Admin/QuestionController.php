@@ -190,9 +190,6 @@ class QuestionController extends Controller
         $id = $input['id'];
 
         $question = Questions::find($id);
-        $answer = Questions::find($id)->correctAnswers;
-
-        // $db_answers = Questions::find($id)->correctAnswers;
         
         \DB::beginTransaction();
 
@@ -202,11 +199,13 @@ class QuestionController extends Controller
               'question' => $input['question'],
             ]);
 
-            foreach($answer as $ans) {
+            $dbAnswers = $question->correctAnswers;
+            dd($dbAnswers);
+
+            foreach($dbAnswers as $dbAns) {
                 foreach($input['answers'] as $answer){
-                    $question->correctAnswers()->update([
-                        'answer' => $answer,
-                    ]);
+                    $dbAns->answer = $answer;
+                    $dbAns->save();
                 }
             }
             

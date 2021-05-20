@@ -52,6 +52,12 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'can:admin']], funct
     // 問題の削除
     Route::post('question/destroy', 'Admin\QuestionController@destroy')->name('question.destroy');
 
+    // テスト表示
+    Route::get('test/testList', 'Admin\ScoringController@test')->name('test.testList');
+
+    // テスト採点機能
+    Route::post('test/scoring', 'Admin\ScoringController@scoring')->name('test.scoring');
+
     // テスト採点履歴機能
     Route::get('question/HistoriesList', 'Admin\HistoryController@historiesList')->name('question.historiesList');
 });
