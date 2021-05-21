@@ -16,7 +16,7 @@ class UsersTableSeeder extends Seeder
         factory(User::class, 2)->create();
 
         DB::table('users')->insert([
-            'name' => Str::random(10),
+            'name' => '管理テスト',
             'password' => Hash::make('password'),
             'admin_flag' => 1,
         ]);

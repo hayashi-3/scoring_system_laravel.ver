@@ -18,10 +18,12 @@
                 </div>
 
             </div>
+            <h3>管理者ページ</h3>
             <div class="link">
-                <a href="#">問題・答え登録 ></a><br>
-                <a href="#">テストをする ></a><br>
-                <a href="#">採点履歴 ></a>
+                <a href="list">問題と答えを確認・登録する ></a><br>
+                <a href="{{ action('Admin\ScoringController@test') }}">テストをする ></a><br>
+                <a href="{{ action('Admin\HistoryController@historiesList') }}">過去の採点結果をみる ></a><br>
+                <a href="/admin/user/list">ユーザーを登録する ></a>
             </div>
 
         </div>
