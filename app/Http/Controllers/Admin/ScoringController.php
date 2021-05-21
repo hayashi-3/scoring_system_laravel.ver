@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 use App\Questions;
 use App\CorrectAnswers;
 use App\Histories;
@@ -50,20 +51,21 @@ class ScoringController extends Controller
         $user_id = Auth::id();
         $user = Auth::user();
 
-        \DB::beginTransaction();
-            try {
+        // \DB::beginTransaction();
+            // try {
                 $history = new Histories();
                 $history->user_id = $user_id;
                 $history->point = $result;
+                $history->created_at = Carbon::now();
                 // modelにて$timestampsをfalseにしている
                 $history->save();
 
-        \DB::commit();
+        // \DB::commit();
 
-        } catch(\Throwable $e) {
-            \DB::rollback();
-            abort(500);
-        }
+        // } catch(\Throwable $e) {
+        //     \DB::rollback();
+        //     abort(500);
+        // }
 
         return view('admin.scoring.result', compact('user', 'q_count', 'result', 'score'));
 

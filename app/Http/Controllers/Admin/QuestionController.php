@@ -197,34 +197,24 @@ class QuestionController extends Controller
             $dbAnsIds[] = $dbAns['id'];
         }
 
-
-        // \DB::beginTransaction();
-
-        //   try {
-        
+        \DB::beginTransaction();
+          try {  
             $question->update([
               'question' => $input['question'],
             ]);
 
-            // saveだとnewしないと同じインスタンスを使ってsaveしてしまう?
-            // correctAnswerをnewしてしまうとquestionから引っ張ってきたのが消える
-            foreach($dbAnsIds as $dbAnsId) {
-                foreach($input['answers'] as $inputAnswer){
-                    $ca = DB::table('correct_answers');
-                    $data = $ca
-                    ->where('id', $dbAnsId)
-                    ->update([
-                        'answer' => $inputAnswer,
-                    ]);
-                }
-            }
+            for ($i =0; $i < count( $input['answers']); $i++) {
+                DB::table('correct_answers')->where('id', $dbAnsIds[$i])->update([
+                          'answer' => $input['answers'][$i],
+                      ]);
+              }
             
-        // \DB::commit();
+        \DB::commit();
 
-        // } catch(\Throwable $e) {
-        //     \DB::rollback();
-        //     abort(500);
-        // }
+        } catch(\Throwable $e) {
+            \DB::rollback();
+            abort(500);
+        }
 
         return redirect(route('list'));
     }

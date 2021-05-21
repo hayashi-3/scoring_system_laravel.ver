@@ -29,7 +29,7 @@
                   <input
                       name="answers[]"
                       class="form-control"
-                      value="{{ old('answers') }}"
+                      value="{{ old('answers.0') }}"
                       type="text"
                   >
                   @if ($errors->has('answers'))
@@ -45,7 +45,7 @@
                   <input
                       name="answers[]"
                       class="form-control"
-                      value="{{ old('answers') }}"
+                      value="{{ old('answers.1') }}"
                       type="text"
                   >
                   @if ($errors->has('answers'))
