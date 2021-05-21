@@ -55,7 +55,8 @@ class ScoringController extends Controller
                 $history = new Histories();
                 $history->user_id = $user_id;
                 $history->point = $result;
-                $history->save();                
+                // modelにて$timestampsをfalseにしている
+                $history->save();
 
         \DB::commit();
 

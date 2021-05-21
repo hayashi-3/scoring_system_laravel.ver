@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Validator;
+use Illuminate\Support\Facades\DB;
 
 use App\Questions;
 use App\CorrectAnswers;
@@ -190,31 +191,40 @@ class QuestionController extends Controller
         $id = $input['id'];
 
         $question = Questions::find($id);
-        
-        \DB::beginTransaction();
+        $dbAnswers = $question->correctAnswers;
 
-          try {
+        foreach($dbAnswers as $dbAns) {
+            $dbAnsIds[] = $dbAns['id'];
+        }
+
+
+        // \DB::beginTransaction();
+
+        //   try {
         
             $question->update([
               'question' => $input['question'],
             ]);
 
-            $dbAnswers = $question->correctAnswers;
-            dd($dbAnswers);
-
-            foreach($dbAnswers as $dbAns) {
-                foreach($input['answers'] as $answer){
-                    $dbAns->answer = $answer;
-                    $dbAns->save();
+            // saveだとnewしないと同じインスタンスを使ってsaveしてしまう?
+            // correctAnswerをnewしてしまうとquestionから引っ張ってきたのが消える
+            foreach($dbAnsIds as $dbAnsId) {
+                foreach($input['answers'] as $inputAnswer){
+                    $ca = DB::table('correct_answers');
+                    $data = $ca
+                    ->where('id', $dbAnsId)
+                    ->update([
+                        'answer' => $inputAnswer,
+                    ]);
                 }
             }
             
-        \DB::commit();
+        // \DB::commit();
 
-        } catch(\Throwable $e) {
-            \DB::rollback();
-            abort(500);
-        }
+        // } catch(\Throwable $e) {
+        //     \DB::rollback();
+        //     abort(500);
+        // }
 
         return redirect(route('list'));
     }
