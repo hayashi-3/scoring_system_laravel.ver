@@ -12,6 +12,9 @@ use App\Histories;
 
 class ScoringController extends Controller
 {
+
+    private $formItems = ["ids", "answers"];
+
     public function test()
     {
         $questions = Questions::inRandomOrder()->get();
@@ -20,25 +23,47 @@ class ScoringController extends Controller
 
     public function scoring(Request $request)
     {
-        // データを受け取る
-        $inputs = $request->all();
+        $inputs = $request->only($this->formItems);
+
         $question_ids = $inputs['ids'];
+        $answers = $inputs['answers'];
+
+        // [$question_id => $inputs['answers']]
+        $input_answers = [];
+        foreach ($answers as $answer){
+          foreach ($question_ids as $question_id){
+            if (!isset($input_answers[$question_id])) {
+                $input_answers[$question_id] = $answer;
+              break;
+            }
+          }
+        }
+
+        // [answer => questions_id]
+        foreach ($question_ids as $question_id){
+            $db_answers[] = Questions::find($question_id)->correctAnswers()->where('questions_id', $question_id)->get(['questions_id','answer'])->all();
+        }
+        
+
+        // [$question_id => dbのanswer]
+        $db_a = [];
+        foreach ($db_answers as $db_answer){
+            foreach ($db_answer as $db_ans){
+                $questions_id = $db_ans['questions_id'];
+                $answer = $db_ans['answer'];
+                $db_a[]= ["questions_id" => $questions_id, "answer" => $answer];
+            }
+        }
 
         $score = 0;
-        
-        // dbにある正解を取ってきてinputと比較する
-        foreach ($question_ids as $q_id) {
-            $question = Questions::find($q_id);
 
-           foreach($question->correctAnswers as $db_answers){
-               $db_answer = $db_answers->answer;
-                foreach($inputs['answers'] as $input_answer){
-                    if($db_answer === $input_answer){
-                        ++$score;
-                        break;
-                    }
-                }
-           }
+        // [$question_id => $inputs['answers']]と[$db_question_id => $db_answer]
+        foreach ($db_a as $a) {
+            $input_answer = $input_answers[$a["questions_id"]];
+            if($a["answer"] == $input_answer){
+                $score++;
+                break;
+            }
         }
 
         // 問題数カウント
@@ -51,8 +76,8 @@ class ScoringController extends Controller
         $user_id = Auth::id();
         $user = Auth::user();
 
-        // \DB::beginTransaction();
-            // try {
+        \DB::beginTransaction();
+            try {
                 $history = new Histories();
                 $history->user_id = $user_id;
                 $history->point = $result;
@@ -60,14 +85,13 @@ class ScoringController extends Controller
                 // modelにて$timestampsをfalseにしている
                 $history->save();
 
-        // \DB::commit();
+        \DB::commit();
 
-        // } catch(\Throwable $e) {
-        //     \DB::rollback();
-        //     abort(500);
-        // }
+        } catch(\Throwable $e) {
+            \DB::rollback();
+            abort(500);
+        }
 
         return view('admin.scoring.result', compact('user', 'q_count', 'result', 'score'));
-
     }
 }

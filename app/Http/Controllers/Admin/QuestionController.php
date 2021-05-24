@@ -17,7 +17,7 @@ class QuestionController extends Controller
 
 	private $validator = [
 		'question' => 'required|string|max:500',
-		'answer.*' => 'required|string|max:200',
+		'answers.*' => 'required|string|max:200',
 	];
 
     /**
@@ -149,7 +149,7 @@ class QuestionController extends Controller
 
         $validator = Validator::make($input, $this->validator);
 		if($validator->fails()){
-			return redirect()->action("Admin\QuestionController@edit")
+			return redirect()->action("Admin\QuestionController@edit", $input['id'])
 				->withInput()
 				->withErrors($validator);
 		}
