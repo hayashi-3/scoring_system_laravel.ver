@@ -26,7 +26,7 @@
                 >{{ $question->question }}</textarea>
                 @if ($errors->has('question'))
                     <div class="text-danger">
-                        {{ $errors->first('question') }}
+                        <p>入力必須項目です。500文字以内で入力してください。</p>
                     </div>
                 @endif
               </div>
@@ -42,14 +42,16 @@
                     value="{{ $a->answer }}"
                     type="text"
                 >
-                @if ($errors->has('answers'))
-                    <div class="text-danger">
-                        {{ $errors->first('answers') }}
-                    </div>
+                @if ($errors->has('answers.*'))
+                    @foreach ($errors->get('answers.*') as $messages)
+                        <div class="text-danger">
+                            <p>この項目は入力必須です。200文字以内で入力してください。</p>
+                        </div>
+                    @endforeach
                 @endif
               </div>
               @endforeach
-              
+
               <div class="mt-5">
                   <a class="btn btn-secondary" href="{{ route('list') }}">
                       キャンセル

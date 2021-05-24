@@ -18,7 +18,7 @@
                   >{{ old('question') }}</textarea>
                   @if ($errors->has('question'))
                       <div class="text-danger">
-                          {{ $errors->first('question') }}
+                          <p>入力必須項目です。500文字以内で入力してください。</p>
                       </div>
                   @endif
               </div>
@@ -32,9 +32,9 @@
                       value="{{ old('answers.0') }}"
                       type="text"
                   >
-                  @if ($errors->has('answers'))
+                  @if ($errors->has('answers.0'))
                       <div class="text-danger">
-                          {{ $errors->first('answers') }}
+                        <p>入力必須項目です。200文字以内で入力してください。</p>
                       </div>
                   @endif
               </div>
@@ -48,9 +48,9 @@
                       value="{{ old('answers.1') }}"
                       type="text"
                   >
-                  @if ($errors->has('answers'))
+                  @if ($errors->has('answers.1'))
                       <div class="text-danger">
-                          {{ $errors->first('answers') }}
+                        <p>入力必須項目です。200文字以内で入力してください。</p>
                       </div>
                   @endif
               </div>

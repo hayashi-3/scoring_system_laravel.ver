@@ -12,6 +12,9 @@ use App\Histories;
 
 class ScoringController extends Controller
 {
+
+    private $formItems = ["ids", "db_answers", "answers"];
+
     public function test()
     {
         $questions = Questions::inRandomOrder()->get();
@@ -20,25 +23,19 @@ class ScoringController extends Controller
 
     public function scoring(Request $request)
     {
-        // データを受け取る
-        $inputs = $request->all();
+        $inputs = $request->only($this->formItems);
         $question_ids = $inputs['ids'];
+        $answers = $inputs['answers'];
+        $db_answers = $inputs['db_answers'];
 
         $score = 0;
-        
-        // dbにある正解を取ってきてinputと比較する
-        foreach ($question_ids as $q_id) {
-            $question = Questions::find($q_id);
-
-           foreach($question->correctAnswers as $db_answers){
-               $db_answer = $db_answers->answer;
-                foreach($inputs['answers'] as $input_answer){
-                    if($db_answer === $input_answer){
-                        ++$score;
-                        break;
-                    }
+        foreach($answers as $answer){
+            foreach($db_answers as $db_answer){
+                if($answer === $db_answer){
+                    $score++;
+                    break;
                 }
-           }
+            }
         }
 
         // 問題数カウント
@@ -51,8 +48,8 @@ class ScoringController extends Controller
         $user_id = Auth::id();
         $user = Auth::user();
 
-        // \DB::beginTransaction();
-            // try {
+        \DB::beginTransaction();
+            try {
                 $history = new Histories();
                 $history->user_id = $user_id;
                 $history->point = $result;
@@ -60,14 +57,13 @@ class ScoringController extends Controller
                 // modelにて$timestampsをfalseにしている
                 $history->save();
 
-        // \DB::commit();
+        \DB::commit();
 
-        // } catch(\Throwable $e) {
-        //     \DB::rollback();
-        //     abort(500);
-        // }
+        } catch(\Throwable $e) {
+            \DB::rollback();
+            abort(500);
+        }
 
         return view('admin.scoring.result', compact('user', 'q_count', 'result', 'score'));
-
     }
 }
