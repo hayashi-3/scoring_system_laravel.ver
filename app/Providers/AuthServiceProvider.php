@@ -29,5 +29,10 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('admin', function($user) {
             return $user->admin_flag === 1;
         });
+
+        //ユーザー設定
+        Gate::define('user', function($user) {
+            return $user->admin_flag === 0;
+        });
     }
 }
