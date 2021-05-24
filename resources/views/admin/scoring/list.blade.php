@@ -18,10 +18,7 @@
             <input type="hidden" name="ids[]" value="{{ $q->id }}">
             <td>{{ $q->id }}</td>
             <td>{{ $q->question }}</td>
-            @foreach ($q->correctAnswers as $answers)
-                <input type="text" name="answer_ids[]" value="{{ $answers->id }}">
-            @endforeach
-              <td><input type="text" name="answers[]"></td>
+            <td><input type="text" name="answers[]"></td>
           </tr>
         @endforeach
         <td>

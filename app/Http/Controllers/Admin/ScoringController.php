@@ -13,7 +13,7 @@ use App\Histories;
 class ScoringController extends Controller
 {
 
-    private $formItems = ["ids", "answer_ids", "answers"];
+    private $formItems = ["ids", "answers"];
 
     public function test()
     {
@@ -26,7 +26,6 @@ class ScoringController extends Controller
         $inputs = $request->only($this->formItems);
 
         $question_ids = $inputs['ids'];
-        $answer_ids = $inputs['answer_ids'];
         $answers = $inputs['answers'];
 
         // [$question_id => $inputs['answers']]
@@ -40,42 +39,32 @@ class ScoringController extends Controller
           }
         }
 
-        // [questions_id:1, answer:hoge]
+        // [answer => questions_id]
         foreach ($question_ids as $question_id){
-            $db_q_ids[] = Questions::find($question_id)->correctAnswers()->get(['questions_id','answer'])->all();
+            $db_answers[] = Questions::find($question_id)->correctAnswers()->where('questions_id', $question_id)->get(['questions_id','answer'])->all();
         }
+        
 
-        $db_q_ids = array_flip($db_q_ids);
-        dd($db_q_ids);
-
-         // ここからはまだ書いてない
-        $db_ans = [];
-        for ($i = 0; $i < count($db_q_answers); $i++) {
-            $db_q_ans = $db_q_answers[$i];
-            for ($j = 0; $j < $i; $j++){
-                $db_q_id = $db_q_ids[$j];
-                for ($k = 0; $k < count($db_q_id); $k++){
-                    $db_id = $db_q_id[$k];
-                    $db_ans[$db_id] = $db_q_ans;
-                }
+        // [$question_id => dbのanswer]
+        $db_a = [];
+        foreach ($db_answers as $db_answer){
+            foreach ($db_answer as $db_ans){
+                $questions_id = $db_ans['questions_id'];
+                $answer = $db_ans['answer'];
+                $db_a[]= ["questions_id" => $questions_id, "answer" => $answer];
             }
         }
-        dd($db_ans);
 
         $score = 0;
 
         // [$question_id => $inputs['answers']]と[$db_question_id => $db_answer]
-        foreach ($tmp as $input_answer) {
-            $db_answers = CorrectAnswers::find($answer_id);
-            for($j=0; $j < count($answers); $j++){
-                $input_answer = $answers[$j];
-                if($db_answer == $input_answer){
-                    $score++;
-                    break;
-                }
+        foreach ($db_a as $a) {
+            $input_answer = $input_answers[$a["questions_id"]];
+            if($a["answer"] == $input_answer){
+                $score++;
+                break;
             }
         }
-        dd($score);
 
         // 問題数カウント
         $q_count = count($question_ids);
