@@ -26,43 +26,38 @@ class ScoringController extends Controller
         $inputs = $request->only($this->formItems);
 
         $question_ids = $inputs['ids'];
-        $answers = $inputs['answers'];
+        $input_answers = $inputs['answers'];
 
         // [$question_id => $inputs['answers']]
-        $input_answers = [];
-        foreach ($answers as $answer){
-          foreach ($question_ids as $question_id){
-            if (!isset($input_answers[$question_id])) {
-                $input_answers[$question_id] = $answer;
-              break;
-            }
-          }
-        }
+        $arr_input_answers[] = array_combine($question_ids, $input_answers);
 
-        // [answer => questions_id]
+        // [answer => hoge, questions_id => fuga]
         foreach ($question_ids as $question_id){
-            $db_answers[] = Questions::find($question_id)->correctAnswers()->where('questions_id', $question_id)->get(['questions_id','answer'])->all();
+            $db_answers[] = Questions::find($question_id)
+                ->correctAnswers()->where('questions_id', $question_id)
+                ->get(['questions_id','answer'])->all();
         }
-        
 
         // [$question_id => dbのanswer]
-        $db_a = [];
         foreach ($db_answers as $db_answer){
             foreach ($db_answer as $db_ans){
                 $questions_id = $db_ans['questions_id'];
                 $answer = $db_ans['answer'];
-                $db_a[]= ["questions_id" => $questions_id, "answer" => $answer];
+                $db_a[] = ["questions_id" => $questions_id, "answer" => $answer];
             }
         }
 
         $score = 0;
 
-        // [$question_id => $inputs['answers']]と[$db_question_id => $db_answer]
+        // [$question_id => $inputs['answers']]と[$question_id => dbのanswer]
         foreach ($db_a as $a) {
-            $input_answer = $input_answers[$a["questions_id"]];
-            if($a["answer"] == $input_answer){
-                $score++;
-                break;
+            for ($j = 0; $j < count($arr_input_answers); $j++) {
+                $arr_inp_ans = $arr_input_answers[$j];
+                $input_answer = $arr_inp_ans[$a["questions_id"]];
+                if($a["answer"] === $input_answer){
+                    $score++;
+                    break;
+                }
             }
         }
 
@@ -77,6 +72,7 @@ class ScoringController extends Controller
         $user = Auth::user();
 
         \DB::beginTransaction();
+
             try {
                 $history = new Histories();
                 $history->user_id = $user_id;
